@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import {
   ConstructorPage,
   Feed,
@@ -18,9 +18,13 @@ import { useDispatch } from '../../../src/services/store';
 import { useEffect } from 'react';
 import { getCookie } from '../../../src/utils/cookie';
 import { getUser, setUser } from '../../../src/slices/userSlice';
+import { getIngredients } from '../../../src/slices/ingredientsSlice';
 
 const App = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const background = location.state?.background;
 
   useEffect(() => {
     dispatch(getUser());
@@ -31,10 +35,14 @@ const App = () => {
     }
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(getIngredients());
+  }, [dispatch]);
+
   return (
     <div className={styles.app}>
       <AppHeader />
-      <Routes>
+      <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
         <Route path='*' element={<NotFound404 />} />
@@ -86,49 +94,63 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path='/feed/:number'
-          element={
-            /* TODO: onClose */
-            <Modal
-              title='Детали заказа'
-              onClose={() => {
-                history.back();
-              }}
-            >
-              <OrderInfo />
-            </Modal>
-          }
-        />
-        <Route
-          path='/ingredients/:id'
-          element={
-            <Modal
-              title='Ингредиенты'
-              onClose={() => {
-                history.back();
-              }}
-            >
-              <IngredientDetails />
-            </Modal>
-          }
-        />
+        <Route path='/feed/:number' element={<OrderInfo />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route
           path='/profile/orders/:number'
           element={
             <ProtectedRoute>
-              <Modal
-                title='Информация о заказе'
-                onClose={() => {
-                  history.back();
-                }}
-              >
-                <OrderInfo />
-              </Modal>
+              <OrderInfo />
             </ProtectedRoute>
           }
         />
       </Routes>
+
+      {background && (
+        <>
+          <Routes>
+            <Route
+              path='/feed/:number'
+              element={
+                <Modal
+                  title='Детали заказа'
+                  onClose={() => {
+                    navigate(-1);
+                  }}
+                >
+                  <OrderInfo />
+                </Modal>
+              }
+            />
+            <Route
+              path='/ingredients/:id'
+              element={
+                <Modal
+                  title='Ингредиенты'
+                  onClose={() => {
+                    navigate(-1);
+                  }}
+                >
+                  <IngredientDetails />
+                </Modal>
+              }
+            />
+            <Route
+              path='/profile/orders/:number'
+              element={
+                <Modal
+                  title='Информация о заказе'
+                  onClose={() => {
+                    navigate(-1);
+                  }}
+                >
+                  <OrderInfo />
+                </Modal>
+              }
+            />
+          </Routes>
+        </>
+      )}
     </div>
   );
 };

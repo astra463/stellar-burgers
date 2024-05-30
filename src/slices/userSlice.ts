@@ -52,10 +52,7 @@ const initialState: TUserState = {
 
 export const getUserOrders = createAsyncThunk(
   'user/getUserOrders',
-  async () => {
-    const orders = await getOrdersApi();
-    return orders;
-  }
+  getOrdersApi
 );
 
 export const registerUser = createAsyncThunk(

@@ -3,11 +3,9 @@ import { useInView } from 'react-intersection-observer';
 
 import { TIngredient, TTabMode } from '@utils-types';
 import { BurgerIngredientsUI } from '../ui/burger-ingredients';
-import { useDispatch, useSelector } from '../../services/store';
-import { getIngredients } from '../../../src/slices/ingredientsSlice';
+import { useSelector } from '../../services/store';
 
 export const BurgerIngredients: FC = () => {
-  const dispatch = useDispatch();
   const ingredients = useSelector(
     (state) => state.burgerIngredients.ingredients
   );
@@ -49,10 +47,6 @@ export const BurgerIngredients: FC = () => {
   const [saucesRef, inViewSauces] = useInView({
     threshold: 0
   });
-
-  useEffect(() => {
-    dispatch(getIngredients());
-  }, [dispatch]);
 
   useEffect(() => {
     if (inViewBuns) {
