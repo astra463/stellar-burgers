@@ -3,7 +3,7 @@ import { TIngredient } from '../utils/types';
 import { getIngredientsApi } from '@api';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-interface IngredientsState {
+export interface IngredientsState {
   ingredients: TIngredient[];
   loading: boolean;
   error: string | undefined;
@@ -21,7 +21,7 @@ export const getIngredients = createAsyncThunk('getIngredients', async () => {
   return ingredients;
 });
 
-const ingredientsSlice = createSlice({
+export const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
   reducers: {},
@@ -29,9 +29,11 @@ const ingredientsSlice = createSlice({
     builder
       .addCase(getIngredients.pending, (state) => {
         state.loading = true;
+        state.error = undefined;
       })
       .addCase(getIngredients.fulfilled, (state, action) => {
         state.loading = false;
+        state.error = undefined;
         state.ingredients = action.payload;
       })
       .addCase(getIngredients.rejected, (state, action) => {

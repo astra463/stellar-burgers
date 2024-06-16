@@ -9,7 +9,6 @@ export const BurgerIngredients: FC = () => {
   const ingredients = useSelector(
     (state) => state.burgerIngredients.ingredients
   );
-
   const buns = useMemo(
     () =>
       ingredients.filter(

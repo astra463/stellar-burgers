@@ -22,7 +22,8 @@ export const ProtectedRoute = ({
   }
 
   if (!isAuthenticated) {
-    return <Navigate replace to='/login' state={{ from: location }} />;
+    const from = location.state?.from || { pathname: '/' };
+    return !isAuthenticated ? children : <Navigate replace to={from} />;
   }
 
   return children;

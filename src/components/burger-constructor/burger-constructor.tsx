@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from '../../../src/services/store';
 import { selectIsAuthenticated } from '../../../src/slices/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { clearOrder, placeOrder } from '../../../src/slices/orderSlice';
-import { clearOrderDetails } from '../../../src/slices/orderDetailsSlice';
+import { clearConstructorIngredients } from '../../../src/slices/constructorSlice';
 
 export const BurgerConstructor: FC = () => {
   /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
@@ -34,6 +34,7 @@ export const BurgerConstructor: FC = () => {
 
   const closeOrderModal = () => {
     dispatch(clearOrder());
+    dispatch(clearConstructorIngredients());
   };
 
   const price = useMemo(
