@@ -1,15 +1,35 @@
-import { useState, useRef, useEffect, FC } from 'react';
+import { useState, useRef, useEffect, FC, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
-import { TTabMode } from '@utils-types';
+import { TIngredient, TTabMode } from '@utils-types';
 import { BurgerIngredientsUI } from '../ui/burger-ingredients';
+import { useSelector } from '../../services/store';
 
 export const BurgerIngredients: FC = () => {
-  /** TODO: взять переменные из стора */
-  const buns = [];
-  const mains = [];
-  const sauces = [];
-
+  const ingredients = useSelector(
+    (state) => state.burgerIngredients.ingredients
+  );
+  const buns = useMemo(
+    () =>
+      ingredients.filter(
+        (ingredient: TIngredient) => ingredient.type === 'bun'
+      ),
+    [ingredients]
+  );
+  const mains = useMemo(
+    () =>
+      ingredients.filter(
+        (ingredient: TIngredient) => ingredient.type === 'main'
+      ),
+    [ingredients]
+  );
+  const sauces = useMemo(
+    () =>
+      ingredients.filter(
+        (ingredient: TIngredient) => ingredient.type === 'sauce'
+      ),
+    [ingredients]
+  );
   const [currentTab, setCurrentTab] = useState<TTabMode>('bun');
   const titleBunRef = useRef<HTMLHeadingElement>(null);
   const titleMainRef = useRef<HTMLHeadingElement>(null);
@@ -46,8 +66,6 @@ export const BurgerIngredients: FC = () => {
     if (tab === 'sauce')
       titleSaucesRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  return null;
 
   return (
     <BurgerIngredientsUI
