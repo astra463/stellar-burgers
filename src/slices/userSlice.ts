@@ -13,9 +13,8 @@ import { setCookie } from '../../src/utils/cookie';
 import { RootState } from '../../src/services/store';
 import { TOrder, TUser } from '@utils-types';
 import { deleteCookie } from '../utils/cookie';
-import { stat } from 'fs';
 
-type TUserState = {
+export type TUserState = {
   data: TUser | null;
   registerUserRequest: boolean;
   registerUserError: null | string;

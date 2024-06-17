@@ -1,8 +1,8 @@
 import { orderBurgerApi } from '@api';
-import { createAsyncThunk, createSlice, isPending } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
 
-type TInitialState = {
+export type TInitialState = {
   isPending: boolean;
   name: string | '';
   order: TOrder | null;

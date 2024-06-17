@@ -1,52 +1,104 @@
-import { IngredientsState, getIngredients } from './ingredientsSlice';
-import ingredientsReducer from '../slices/ingredientsSlice';
+import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
+import orderDetailsReducer, { getOrderDetails, OrderDetailState, clearOrderDetails } from './orderDetailsSlice';
+import { getOrderByNumberApi } from '@api';
+import { TOrder } from '@utils-types';
 
-describe('IngredientsSlice', () => {
-  const initialState: IngredientsState = {
-    ingredients: [],
-    loading: false,
-    error: undefined
+jest.mock('@api');
+
+const localStorageMock = (function () {
+  let store: { [key: string]: string } = {};
+
+  return {
+    getItem(key: string) {
+      return store[key] || null;
+    },
+    setItem(key: string, value: string) {
+      store[key] = value;
+    },
+    removeItem(key: string) {
+      delete store[key];
+    },
+    clear() {
+      store = {};
+    },
   };
+})();
 
-  it('should set loading state', () => {
-    const action = { type: getIngredients.pending.type };
+Object.defineProperty(global, 'localStorage', {
+  value: localStorageMock,
+});
 
-    const state = ingredientsReducer(initialState, action);
-    
-    expect(state).toEqual({
-      ...initialState,
-      loading: true,
-      error: undefined
+const mockOrderData: { orders: TOrder[] } = {
+  orders: [
+    {
+      _id: '1',
+      status: 'done',
+      name: 'Order 1',
+      createdAt: '2023-01-01',
+      updatedAt: '2023-01-02',
+      number: 12345,
+      ingredients: ['1', '2', '3']
+    }
+  ]
+};
+
+describe('orderDetailsSlice', () => {
+  let store: EnhancedStore<{ orderDetail: OrderDetailState }>;
+
+  beforeEach(() => {
+    store = configureStore({
+      reducer: {
+        orderDetail: orderDetailsReducer,
+      }
     });
   });
 
-  it('should set ingredients and reset loading state on fulfilled', () => {
-    const ingredients = [{ id: 1, name: 'Bun' }];
-    const action = {
-      type: getIngredients.fulfilled.type,
-      payload: ingredients
-    };
-    const state = ingredientsReducer(initialState, action);
-
-    expect(state).toEqual({
-      ...initialState,
-      ingredients,
+  it('должен вернуть начальное состояние', () => {
+    const initialState: OrderDetailState = {
+      order: null,
       loading: false,
-      error: undefined
-    });
+      error: null,
+      orderIngredients: []
+    };
+    expect(store.getState().orderDetail).toEqual(initialState);
   });
 
-  it('should set error and reset loading state on rejected', () => {
-    const error = 'Error message';
-    const action = {
-      type: getIngredients.rejected.type,
-      error: { message: error }
-    };
-    const state = ingredientsReducer(initialState, action);
-    expect(state).toEqual({
-      ...initialState,
-      loading: false,
-      error
-    });
+  it('должен обрабатывать getOrderDetails.pending', () => {
+    store.dispatch({ type: getOrderDetails.pending.type });
+    const state = store.getState().orderDetail;
+    expect(state.loading).toBe(true);
+    expect(state.error).toBeNull();
+  });
+
+  it('должен обрабатывать getOrderDetails.fulfilled', async () => {
+    (getOrderByNumberApi as jest.Mock).mockResolvedValueOnce(mockOrderData);
+
+    await store.dispatch(getOrderDetails(12345) as any);
+
+    const state = store.getState().orderDetail;
+    expect(state.loading).toBe(false);
+    expect(state.error).toBeNull();
+    expect(state.order).toEqual(mockOrderData.orders[0]);
+    expect(state.orderIngredients).toEqual(mockOrderData.orders[0].ingredients);
+  });
+
+  it('должен обрабатывать getOrderDetails.rejected', async () => {
+    const errorMessage = 'Ошибка загрузки заказа';
+    (getOrderByNumberApi as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+
+    await store.dispatch(getOrderDetails(12345) as any);
+
+    const state = store.getState().orderDetail;
+    expect(state.loading).toBe(false);
+    expect(state.error).toBe(errorMessage);
+  });
+
+  it('должен обрабатывать clearOrderDetails', () => {
+    store.dispatch(clearOrderDetails());
+    const state = store.getState().orderDetail;
+    expect(state.order).toBeNull();
+    expect(state.loading).toBe(false);
+    expect(state.error).toBeNull();
+    expect(state.orderIngredients).toEqual([]);
   });
 });

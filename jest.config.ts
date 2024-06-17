@@ -22,7 +22,12 @@ const config: Config = {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: undefined,
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}', // Пути, по которым будет собираться информация о покрытии
+    '!src/**/*.d.ts', // Исключение файлов типов TypeScript
+    '!src/index.tsx', // Исключение входного файла приложения
+    // Добавьте другие исключения по необходимости
+  ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -36,12 +41,12 @@ const config: Config = {
   coverageProvider: "v8",
 
   // A list of reporter names that Jest uses when writing coverage reports
-  // coverageReporters: [
-  //   "json",
-  //   "text",
-  //   "lcov",
-  //   "clover"
-  // ],
+  coverageReporters: [
+    "json",
+    "text",
+    "lcov",
+    "clover"
+  ],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
@@ -90,7 +95,10 @@ const config: Config = {
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
+  moduleNameMapper: {
+    '^@api$': '<rootDir>/src/utils/burger-api.ts',
+    '^@utils/types$': '<rootDir>/src/utils/types.ts',
+  },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],

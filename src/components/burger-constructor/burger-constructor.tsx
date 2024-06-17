@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react';
-import { TConstructorIngredient } from '@utils-types';
+import { TConstructorIngredient, TIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import { useDispatch, useSelector } from '../../../src/services/store';
 import { selectIsAuthenticated } from '../../../src/slices/userSlice';
@@ -24,7 +24,7 @@ export const BurgerConstructor: FC = () => {
       navigate('/login');
     } else if (isAuthenticated) {
       const orderData = [
-        ...constructorItems.ingredients.map((item) => item._id),
+        ...constructorItems.ingredients.map((item: TIngredient) => item._id),
         constructorItems.bun._id,
         constructorItems.bun._id
       ];
@@ -58,3 +58,4 @@ export const BurgerConstructor: FC = () => {
     />
   );
 };
+
