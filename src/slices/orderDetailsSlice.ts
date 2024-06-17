@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { TIngredient, TOrder } from '@utils-types';
 import { getOrderByNumberApi } from '@api';
 
-interface OrderDetailState {
+export interface OrderDetailState {
   order: TOrder | null;
   loading: boolean;
   error: string | null;
